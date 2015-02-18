@@ -113,6 +113,21 @@ Stream.prototype = {
     this.gotValueWhileInactive = false;
   },
 
+  getKey: function(key) {
+    if (this.children === undefined) {
+      this.children = create(null);
+    }
+
+    var keyStream = this.children[key];
+
+    if (keyStream === undefined) {
+      keyStream = this._makeChildStream(key);
+      this.children[key] = keyStream;
+    }
+
+    return keyStream;
+  },
+
   get: function(path) {
     var firstKey = getFirstKey(path);
     var tailPath = getTailPath(path);
