@@ -1352,6 +1352,11 @@ var View = CoreView.extend(
       nonVirtualParentView.set(viewName, null);
     }
 
+    // Destroy HTMLbars template
+    if (this.lastResult) {
+      this.lastResult.destroy();
+    }
+
     return this;
   },
 

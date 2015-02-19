@@ -108,9 +108,22 @@ Stream.prototype = {
     this.dependencyTail = null;
     this.dependency = null;
     this.children = undefined;
+    this.dependencies = undefined;
     this._label = undefined;
     this.isActive = false;
     this.gotValueWhileInactive = false;
+  },
+
+  addDependency: function(unsubscriber) {
+    if (this.dependencies === undefined) {
+      this.dependencies = [];
+    }
+
+    this.dependencies.push(unsubscriber);
+  },
+
+  removeChild: function(key) {
+    delete this.children[key];
   },
 
   getKey: function(key) {
@@ -277,7 +290,16 @@ Stream.prototype = {
     }
 
     var stream = this;
-    return function() { subscriber.removeFrom(stream); };
+    return function(prune) {
+      subscriber.removeFrom(stream);
+      if (prune) { stream.prune(); }
+    };
+  },
+
+  prune: function() {
+    if (this.subscriberHead === null) {
+      this.destroy(true);
+    }
   },
 
   unsubscribe: function(callback, context) {
@@ -315,18 +337,19 @@ Stream.prototype = {
     }
   },
 
-  destroy: function() {
+  destroy: function(prune) {
     if (this.state !== 'destroyed') {
       this.state = 'destroyed';
-
-      var children = this.children;
-      for (var key in children) {
-        children[key].destroy();
-      }
 
       this.subscriberHead = this.subscriberTail = null;
       this.maybeDeactivate();
       this.dependencies = null;
+
+      var dependencies = this.dependencies;
+
+      for (var i=0, l=dependencies.length; i<l; i++) {
+        dependencies[i](prune);
+      }
 
       return true;
     }
