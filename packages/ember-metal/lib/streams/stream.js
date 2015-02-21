@@ -114,14 +114,6 @@ Stream.prototype = {
     this.gotValueWhileInactive = false;
   },
 
-  addDependency: function(unsubscriber) {
-    if (this.dependencies === undefined) {
-      this.dependencies = [];
-    }
-
-    this.dependencies.push(unsubscriber);
-  },
-
   removeChild: function(key) {
     delete this.children[key];
   },
