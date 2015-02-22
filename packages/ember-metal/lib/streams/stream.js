@@ -3,6 +3,7 @@ import {
   getFirstKey,
   getTailPath
 } from "ember-metal/path_cache";
+import Ember from "ember-metal/core";
 
 /**
 @module ember-metal
@@ -178,7 +179,9 @@ Stream.prototype = {
   },
 
   addDependency: function(stream, callback, context) {
-    if (!stream || !stream.isStream) {
+    Ember.assert("You tried to add a dependency to a stream, but the dependency stream did not exist.", !!stream);
+
+    if (!stream.isStream) {
       return;
     }
 
@@ -270,6 +273,8 @@ Stream.prototype = {
   },
 
   subscribe: function(callback, context) {
+    Ember.assert("You tried to subscribe to a stream but the callback provided was not a function.", typeof callback === 'function');
+
     var subscriber = new Subscriber(callback, context, this);
     if (this.subscriberHead === null) {
       this.subscriberHead = this.subscriberTail = subscriber;

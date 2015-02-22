@@ -21,8 +21,6 @@ function KeyStream(source, key) {
   this.addDependency(source);
   this.obj = undefined;
   this.key = key;
-
-  this.addDependency(source.subscribe(this._didChange, this));
 }
 
 KeyStream.prototype = create(Stream.prototype);
