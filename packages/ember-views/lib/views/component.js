@@ -9,7 +9,6 @@ import isNone from 'ember-metal/is_none';
 
 import { computed } from "ember-metal/computed";
 import { bool } from "ember-metal/computed_macros";
-import defaultComponentLayout from "ember-htmlbars/templates/component";
 
 var a_slice = Array.prototype.slice;
 

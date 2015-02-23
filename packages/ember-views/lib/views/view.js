@@ -1284,6 +1284,10 @@ var View = CoreView.extend(
     this[property.name] = property.descriptor.value;
   },
 
+  revalidate: function() {
+    this.renderNode.lastResult.revalidate();
+  },
+
   appendAttr: function(node) {
     return this.currentState.appendAttr(this, node);
   },
