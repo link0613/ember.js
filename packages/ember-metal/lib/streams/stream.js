@@ -76,6 +76,14 @@ Dependency.prototype.removeFrom = function(stream) {
 };
 
 Dependency.prototype.replace = function(stream, callback, context) {
+  if (!stream.isStream) {
+    this.stream = null;
+    this.callback = null;
+    this.context = null;
+    this.removeFrom(this.dependent);
+    return null;
+  }
+
   this.stream = stream;
   this.callback = callback;
   this.context = context;
@@ -84,6 +92,8 @@ Dependency.prototype.replace = function(stream, callback, context) {
     this.unsubscribe();
     this.subscribe();
   }
+
+  return this;
 };
 
 /**
@@ -179,10 +189,8 @@ Stream.prototype = {
   },
 
   addDependency: function(stream, callback, context) {
-    Ember.assert("You tried to add a dependency to a stream, but the dependency stream did not exist.", !!stream);
-
-    if (!stream.isStream) {
-      return;
+    if (!stream || !stream.isStream) {
+      return null;
     }
 
     if (callback === undefined) {
@@ -360,6 +368,14 @@ Stream.prototype = {
       }
       stream = stream.source;
     }
+  }
+};
+
+Stream.wrap = function(value, Kind) {
+  if (value.isStream) {
+    return value;
+  } else {
+    return new Kind(value);
   }
 };
 

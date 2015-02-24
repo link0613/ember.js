@@ -27,9 +27,17 @@ merge(SimpleStream.prototype, {
   setSource: function(nextSource) {
     var prevSource = this.source;
     if (nextSource !== prevSource) {
-      this.dependency.replace(nextSource);
+      this.replaceDependency(nextSource);
       this.source = nextSource;
       this.notify();
+    }
+  },
+
+  replaceDependency: function(nextSource) {
+    if (this.dependency) {
+      this.dependency = this.dependency.replace(nextSource);
+    } else {
+      this.dependency = this.addDependency(nextSource);
     }
   },
 
