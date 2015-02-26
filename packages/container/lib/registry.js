@@ -36,6 +36,7 @@ function Registry(options) {
 
   this._normalizeCache        = dictionary(null);
   this._resolveCache          = dictionary(null);
+  this._failCache             = dictionary(null);
 
   this._options               = dictionary(null);
   this._typeOptions           = dictionary(null);
@@ -224,6 +225,7 @@ Registry.prototype = {
       throw new Error('Cannot re-register: `' + fullName +'`, as it has already been resolved.');
     }
 
+    delete this._failCache[normalizedName];
     this.registrations[normalizedName] = factory;
     this._options[normalizedName] = (options || {});
   },
@@ -251,6 +253,7 @@ Registry.prototype = {
 
     delete this.registrations[normalizedName];
     delete this._resolveCache[normalizedName];
+    delete this._failCache[normalizedName];
     delete this._options[normalizedName];
   },
 
@@ -743,9 +746,15 @@ Registry.prototype = {
 function resolve(registry, normalizedName) {
   var cached = registry._resolveCache[normalizedName];
   if (cached) { return cached; }
+  if (registry._failCache[normalizedName]) { return; }
 
   var resolved = registry.resolver(normalizedName) || registry.registrations[normalizedName];
-  registry._resolveCache[normalizedName] = resolved;
+
+  if (resolved) {
+    registry._resolveCache[normalizedName] = resolved;
+  } else {
+    registry._failCache[normalizedName] = true;
+  }
 
   return resolved;
 }
