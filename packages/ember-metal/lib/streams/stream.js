@@ -107,6 +107,8 @@ function Stream(fn) {
   this.valueFn = fn;
 }
 
+var KeyStream;
+
 Stream.prototype = {
   isStream: true,
 
@@ -123,6 +125,11 @@ Stream.prototype = {
     this._label = undefined;
     this.isActive = false;
     this.gotValueWhileInactive = false;
+  },
+
+  _makeChildStream: function(key) {
+    KeyStream = KeyStream || Ember.__loader.require('ember-views/streams/key_stream').default;
+    return new KeyStream(this, key);
   },
 
   removeChild: function(key) {
