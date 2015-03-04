@@ -254,6 +254,18 @@ Stream.prototype = {
     }
   },
 
+  update: function(callback) {
+    if (this.state !== 'inactive') {
+      this.becameInactive();
+    }
+
+    callback.call(this);
+
+    if (this.state !== 'inactive') {
+      this.becameActive();
+    }
+  },
+
   valueFn: function() {
     throw new Error("Stream error: valueFn not implemented");
   },
