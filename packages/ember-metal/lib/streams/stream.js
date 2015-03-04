@@ -113,7 +113,7 @@ Stream.prototype = {
   isStream: true,
 
   init: function() {
-    this.state = 'dirty';
+    this.state = 'inactive';
     this.cache = undefined;
     this.subscriberHead = null;
     this.subscriberTail = null;
@@ -123,8 +123,6 @@ Stream.prototype = {
     this.children = undefined;
     this.dependencies = undefined;
     this._label = undefined;
-    this.isActive = false;
-    this.gotValueWhileInactive = false;
   },
 
   _makeChildStream: function(key) {
@@ -174,16 +172,11 @@ Stream.prototype = {
   },
 
   value: function() {
-    if (!this.isActive) {
-      this.gotValueWhileInactive = true;
-      this.revalidate();
+    if (this.state === 'inactive') {
       return this.valueFn();
-    }
-
-    if (this.state === 'clean') {
+    } else if (this.state === 'clean') {
       return this.cache;
     } else if (this.state === 'dirty') {
-      this.revalidate();
       var value = this.valueFn();
       this.state = 'clean';
       this.cache = value;
@@ -244,17 +237,10 @@ Stream.prototype = {
   becameActive: function() {},
   becameInactive: function() {},
 
-  // This method is invoked when the value function is called and when
-  // a stream becomes active. This allows changes to be made to a stream's
-  // input, and only do any work in response if the stream has subscribers
-  // or if someone actually gets the stream's value.
-  revalidate: function() {},
-
   maybeActivate: function() {
     if (this.subscriberHead && !this.isActive) {
-      this.isActive = true;
       this.subscribeDependencies();
-      this.revalidate();
+      this.state = 'dirty';
       this.becameActive();
     }
   },
@@ -263,6 +249,7 @@ Stream.prototype = {
     if (!this.subscriberHead && this.isActive) {
       this.isActive = false;
       this.unsubscribeDependencies();
+      this.state = 'inactive';
       this.becameInactive();
     }
   },
@@ -280,8 +267,7 @@ Stream.prototype = {
   },
 
   notifyExcept: function(callbackToSkip, contextToSkip) {
-    if (this.state === 'clean' || this.gotValueWhileInactive) {
-      this.gotValueWhileInactive = false;
+    if (this.state === 'clean') {
       this.state = 'dirty';
       this._notifySubscribers(callbackToSkip, contextToSkip);
     }

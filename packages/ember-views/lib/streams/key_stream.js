@@ -9,7 +9,7 @@ import {
   removeObserver
 } from "ember-metal/observer";
 import Stream from "ember-metal/streams/stream";
-import { read, isStream } from "ember-metal/streams/utils";
+import { isStream } from "ember-metal/streams/utils";
 
 function KeyStream(source, key) {
   Ember.assert("KeyStream error: source must be a stream", isStream(source));
@@ -29,19 +29,6 @@ merge(KeyStream.prototype, {
   valueFn: function() {
     if (this.obj) {
       return get(this.obj, this.key);
-    }
-  },
-
-  revalidate: function() {
-    var prevObj = this.obj;
-    var nextObj = read(this.source);
-
-    if (nextObj !== prevObj) {
-      if (prevObj && typeof prevObj === 'object') {
-        removeObserver(prevObj, this.key, this, this.notify);
-      }
-
-      this.obj = nextObj;
     }
   },
 
