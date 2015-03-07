@@ -59,7 +59,7 @@ ShouldDisplayStream.prototype.revalidate = function() {
   }
 };
 
-ShouldDisplayStream.prototype.valueFn = function() {
+ShouldDisplayStream.prototype.compute = function() {
   var truthy = read(this.isTruthyStream);
   if (typeof truthy === 'boolean') {
     return truthy;

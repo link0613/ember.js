@@ -26,7 +26,7 @@ function KeyStream(source, key) {
 KeyStream.prototype = create(Stream.prototype);
 
 merge(KeyStream.prototype, {
-  valueFn: function() {
+  compute: function() {
     if (this.obj) {
       return get(this.obj, this.key);
     }

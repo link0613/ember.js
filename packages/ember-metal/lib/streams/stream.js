@@ -104,7 +104,7 @@ Dependency.prototype.replace = function(stream, callback, context) {
 */
 function Stream(fn) {
   this.init();
-  this.valueFn = fn;
+  this.compute = fn;
 }
 
 var KeyStream;
@@ -126,7 +126,7 @@ Stream.prototype = {
   },
 
   _makeChildStream: function(key) {
-    KeyStream = KeyStream || Ember.__loader.require('ember-views/streams/key_stream').default;
+    KeyStream = KeyStream || Ember.__loader.require('ember-metal/streams/key-stream').default;
     return new KeyStream(this, key);
   },
 
@@ -173,11 +173,11 @@ Stream.prototype = {
 
   value: function() {
     if (this.state === 'inactive') {
-      return this.valueFn();
+      return this.compute();
     } else if (this.state === 'clean') {
       return this.cache;
     } else if (this.state === 'dirty') {
-      var value = this.valueFn();
+      var value = this.compute();
       this.state = 'clean';
       this.cache = value;
       return value;
@@ -266,8 +266,8 @@ Stream.prototype = {
     }
   },
 
-  valueFn: function() {
-    throw new Error("Stream error: valueFn not implemented");
+  compute: function() {
+    throw new Error("Stream error: compute not implemented");
   },
 
   setValue: function() {
