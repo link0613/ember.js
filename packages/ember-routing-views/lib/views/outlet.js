@@ -17,11 +17,6 @@ export var CoreOutletView = View.extend({
     this._outlets = [];
   },
 
-  revalidate: function() {
-    this._outlets = [];
-    this._super();
-  },
-
   setOutletState: function(state) {
     this.outletState = { main: state };
 
@@ -34,6 +29,8 @@ export var CoreOutletView = View.extend({
       for (var i = 0; i < this._outlets.length; i++) {
         this._outlets[i].isDirty = true;
       }
+
+      this._outlets = [];
 
       this.scheduleRevalidate();
     }

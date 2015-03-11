@@ -209,29 +209,6 @@ QUnit.test("The `unbound if` helper should work when its inverse is not present"
   equal(view.$().text(), '');
 });
 
-QUnit.test('should not rerender if truthiness does not change', function() {
-  view = EmberView.create({
-    template: compile('<h1 id="first">{{#if view.shouldDisplay}}{{view view.InnerViewClass}}{{/if}}</h1>'),
-
-    shouldDisplay: true,
-
-    InnerViewClass: EmberView.extend({
-      template: compile('bam')
-    })
-  });
-
-  runAppend(view);
-
-  equal(view.$('#first').text(), 'bam', 'renders block when condition is true');
-  equal(view.$('#first div').text(), 'bam', 'inserts a div into the DOM');
-
-  run(function() {
-    set(view, 'shouldDisplay', 1);
-  });
-
-  equal(view.$('#first').text(), 'bam', 'renders block when condition is true');
-});
-
 QUnit.test('should update the block when object passed to #unless helper changes', function() {
   registry.register('template:advice', compile('<h1>{{#unless view.onDrugs}}{{view.doWellInSchool}}{{/unless}}</h1>'));
 

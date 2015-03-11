@@ -9,13 +9,8 @@ export default function renderView(view, buffer, template) {
 
   var output;
 
-  if (template.isHTMLBars) {
-    Ember.assert('template must be an object. Did you mean to call Ember.Handlebars.compile("...") or specify templateName instead?', typeof template === 'object');
-    output = renderHTMLBarsTemplate(view, buffer, template);
-  } else {
-    Ember.assert('template must be a function. Did you mean to call Ember.Handlebars.compile("...") or specify templateName instead?', typeof template === 'function');
-    output = renderLegacyTemplate(view, buffer, template);
-  }
+  Ember.assert('template must be a function. Did you mean to call Ember.Handlebars.compile("...") or specify templateName instead?', typeof template === 'function');
+  output = renderLegacyTemplate(view, buffer, template);
 
   if (output !== undefined) {
     buffer.push(output);
@@ -24,12 +19,12 @@ export default function renderView(view, buffer, template) {
 
 // This function only gets called once per render of a "root view" (`appendTo`). Otherwise,
 // HTMLBars propagates the existing env and renders templates for a given render node.
-export function renderHTMLBarsTemplate(view, contextualElement, template, morph) {
-  Ember.assert(
-    'The template being rendered by `' + view + '` was compiled with `' + template.revision +
-    '` which does not match `Ember@VERSION_STRING_PLACEHOLDER` (this revision).',
-    template.revision === 'Ember@VERSION_STRING_PLACEHOLDER'
-  );
+export function renderHTMLBarsBlock(view, block, renderNode) {
+  //Ember.assert(
+    //'The template being rendered by `' + view + '` was compiled with `' + template.revision +
+    //'` which does not match `Ember@VERSION_STRING_PLACEHOLDER` (this revision).',
+    //template.revision === 'Ember@VERSION_STRING_PLACEHOLDER'
+  //);
 
   var lifecycleHooks = [{ type: 'didInsertElement', view: view }];
 
@@ -47,7 +42,7 @@ export function renderHTMLBarsTemplate(view, contextualElement, template, morph)
 
   view.env = env;
 
-  return template.render(view, view.env, { contextualElement: contextualElement, renderNode: morph });
+  block(env, [], renderNode, null, null);
 }
 
 function renderLegacyTemplate(view, buffer, template) {
